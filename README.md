@@ -7,6 +7,26 @@ Benchmarks inspired by kostya/benchmarks. Speed, memory, and energy consumed wil
 
 run.bat for windows. (moving to debian as soon as I get a clean, working solution for Solidworks on there)
 
+
+# Manual Run
+Build Analyzer
+```
+clang++ analyzer.cpp -o analyzer 
+```
+
+Build and Run Docker Container
+```
+run.sh build # run.bat for windows
+run.bat shell
+```
+
+Build and Run Test (in Container)
+```
+cd <test_dir>
+make build
+ATTEMPTS=<#_of_attempts> ../../analyzer make run
+```
+
 # TODO
 Benchmark Environment & Testing
 - [ ] Add TCP stream of input data for testing with docker image (great example: [kostya/benchmarks](https://github.com/kostya/benchmarks))
