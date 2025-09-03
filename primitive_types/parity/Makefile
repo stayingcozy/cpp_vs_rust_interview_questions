@@ -12,7 +12,10 @@ all_runners := $(patsubst %,run[%], $(artifacts))
 # Build
 
 .PHONY: build
-build: $(artifacts)
+build: $(artifacts) $(XTIME)
+
+$(XTIME): ../../xtime.cpp
+	$(XTIME_BUILD)
 
 target/base64_cpp_clang_crypto: test-crypto.cpp | target libnotify
 	$(CLANG_CPP_BUILD) -lcrypto
@@ -23,7 +26,6 @@ base64.rs/target/release/base64: $(base64-rs-toml)
 	$(CARGO_BUILD)
 
 # Run
-
 .PHONY: run
 run: $(all_runners)
 
@@ -38,7 +40,6 @@ $(executable_runners):: run[%] : %
 	$(EXECUTABLE_RUN)
 
 # Utilities
-
 .PHONY: clean
 clean:
 	cargo clean --manifest-path $(base64-rs-toml)

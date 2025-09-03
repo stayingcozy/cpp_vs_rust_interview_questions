@@ -5,7 +5,7 @@ clang++ is to be used for C++ compiler to have both rust and c++ use the LLVM co
 
 Benchmarks inspired by kostya/benchmarks. Speed, memory, and energy consumed will be compared. Docker container of debian will be used to standardize the environment. 
 
-run.bat for windows. (moving to debain as soon as I get a clean, working solution for Solidworks on there)
+run.bat for windows. (moving to debian as soon as I get a clean, working solution for Solidworks on there)
 
 # TODO
 Benchmark Environment & Testing

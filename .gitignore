@@ -1,3 +1,15 @@
 *.exe
 .vscode
+target
+
+# root exe
+xtime
+analyzer
+
+# cpp
+*.so
+*.o
+*.a
+
+# rust
 *.pdb

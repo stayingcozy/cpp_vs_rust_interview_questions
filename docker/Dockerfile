@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libc++-19-dev \
     libc++abi-19-dev \
     libssl-dev \
+    liblua5.4-dev \
+    lua5.4 \
     vim \
     powercap-utils \
     ca-certificates \
