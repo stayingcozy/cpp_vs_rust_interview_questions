@@ -8,7 +8,10 @@ Benchmarks inspired by kostya/benchmarks. Speed, memory, and energy consumed wil
 run.bat for windows. (moving to debain as soon as I get a clean, working solution for Solidworks on there)
 
 # TODO
+Benchmark Environment & Testing
 - [ ] Add TCP stream of input data for testing with docker image (great example: [kostya/benchmarks](https://github.com/kostya/benchmarks))
+
+EPI Book Sections
 - [ ] Complete Data Structures and Algorithms
 - [ ] Complete Domain Specific Problems
 - [ ] Complete Honors Class
