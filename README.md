@@ -17,7 +17,7 @@ clang++ analyzer.cpp -o analyzer
 Build and Run Docker Container
 ```
 run.sh build # run.bat for windows
-run.bat shell
+run.sh shell
 ```
 
 Build and Run Test (in Container)
