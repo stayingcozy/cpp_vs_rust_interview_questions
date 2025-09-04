@@ -1,23 +1,21 @@
+#include <iomanip>
 #include <iostream>
 #include <array>
+#include <ctime>
 
-// run clang++ main.cpp -o main.exe in "Developer Command Prompt for VS 2019" for Windows with Visual Studio 2019
-// docker debian env to come to avoid cursed windows runs
-// add -O3 tag for speed tests
+#include <libnotify.h>
 
-short CountBits(unsigned int x) {
-    // O(n)
-    short num_bits = 0;
-    while (x) {
-        num_bits += x & 1;
-        x >>= 1;
-    }
-    return num_bits;
-}
+#ifdef __clang__
+static constexpr auto COMPILER = "clang++";
+#else
+static constexpr auto COMPILER = "g++";
+#endif
 
-// brute-force algorithm of parity
+using namespace std;
+
+// Original parity functions
 short Parity(unsigned long long x) {
-    // O(n)
+    // O(n) brute-force algorithm
     short result = 0;
     while (x) {
         result ^= (x & 1);
@@ -27,13 +25,11 @@ short Parity(unsigned long long x) {
 }
 
 short ParityBitFiddlin(unsigned long long x) {
-    // O(k)
-    // k is the number of bits set to 1
+    // O(k) - k is the number of bits set to 1
     short result = 0;
     while (x) {
-        // Removes lowest set bit until 0
-        result ^= 1; // simple bit flip
-        x &= (x - 1); // Removes lowest set bit 00101100 => 00101000
+        result ^= 1;
+        x &= (x - 1); // Removes lowest set bit
     }
     return result;
 }
@@ -50,20 +46,18 @@ void generatePreComputeParity(std::array<short, 65536>& kPreComputeParity) {
     }
 }
 
-short ParityPreComputeK(unsigned long long x, std::array<short, 65536>& kPreComputeParity) { // 2^16 == 65536
-    // L => width of words
-    // n => word size
-    // O(n/L)
+short ParityPreComputeK(unsigned long long x, std::array<short, 65536>& kPreComputeParity) {
+    // O(n/L) with precomputed lookup table
     const int kMaskSize = 16;
     const int kBitMask = 0xFFFF;
     return kPreComputeParity[x >> (3 * kMaskSize)] ^
-    kPreComputeParity[(x >> (2 * kMaskSize)) & kBitMask] ^
-    kPreComputeParity[(x >> kMaskSize) & kBitMask] ^
-    kPreComputeParity[x & kBitMask];
+           kPreComputeParity[(x >> (2 * kMaskSize)) & kBitMask] ^
+           kPreComputeParity[(x >> kMaskSize) & kBitMask] ^
+           kPreComputeParity[x & kBitMask];
 }
 
 short ParityXOR(unsigned long long x) {
-    // O(logn)
+    // O(logn) XOR folding
     x ^= x >> 32;
     x ^= x >> 16;
     x ^= x >> 8;
@@ -74,22 +68,96 @@ short ParityXOR(unsigned long long x) {
 }
 
 int main() {
-    unsigned int x = 7;
-    short result_x = CountBits(x);
-    short result_y = Parity(x);
-    short result_z = ParityBitFiddlin(x);
-    
+    // Test fixtures for correctness validation
+    const unsigned long long test_values[] = {7, 15, 255, 0xDEADBEEF, 0xABCDEF123456789ULL};
+    const short expected_results[] = {1, 0, 0, 0, 0}; // Expected parity results
+    const int num_fixtures = sizeof(test_values) / sizeof(test_values[0]);
+
+    // Pre-generate lookup table for ParityPreComputeK
     std::array<short, 65536> kPreComputeParity;
     generatePreComputeParity(kPreComputeParity);
-    short result_0 = ParityPreComputeK(x, kPreComputeParity);
-    
-    short result_1 = ParityXOR(x);
 
-    std::cout << "Bits in x: " << result_x << std::endl;
-    std::cout << "Parity Brute Force in x: " << result_y << std::endl;
-    std::cout << "Parity Number of 1's in x: " << result_z << std::endl;
-    std::cout << "Parity PreCompute 16 cache in x: " << result_0 << std::endl;
-    std::cout << "Parity XOR, associative hack in x: " << result_1 << std::endl;
+    // Validate all algorithms produce correct results
+    for (auto i = 0; i < num_fixtures; ++i) {
+        const auto val = test_values[i];
+        const auto expected = expected_results[i];
+
+        if (Parity(val) != expected ||
+            ParityBitFiddlin(val) != expected ||
+            ParityPreComputeK(val, kPreComputeParity) != expected ||
+            ParityXOR(val) != expected) {
+            cerr << "Parity mismatch for value: " << val << endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    const auto NUM_VALUES = 131072;
+    const auto TRIES = 8192;
+
+    // Generate test data
+    unsigned long long test_data[NUM_VALUES];
+    for (int i = 0; i < NUM_VALUES; i++) {
+        test_data[i] = (static_cast<unsigned long long>(rand()) << 32) | rand();
+    }
+
+    auto s_brute = 0;
+    auto t_brute = 0.0;
+    auto s_bitfiddle = 0;
+    auto t_bitfiddle = 0.0;
+    auto s_precompute = 0;
+    auto t_precompute = 0.0;
+    auto s_xor = 0;
+    auto t_xor = 0.0;
+
+    notifying_invoke(
+        [&]() {
+            // Benchmark brute force parity
+            const auto t1 = clock();
+            for (auto i = 0; i < TRIES; i++) {
+                for (auto j = 0; j < NUM_VALUES; j++) {
+                    s_brute += Parity(test_data[j]);
+                }
+            }
+            t_brute = (float)(clock() - t1) / CLOCKS_PER_SEC;
+
+            // Benchmark bit fiddling parity
+            const auto t2 = clock();
+            for (auto i = 0; i < TRIES; i++) {
+                for (auto j = 0; j < NUM_VALUES; j++) {
+                    s_bitfiddle += ParityBitFiddlin(test_data[j]);
+                }
+            }
+            t_bitfiddle = (float)(clock() - t2) / CLOCKS_PER_SEC;
+
+            // Benchmark precomputed parity
+            const auto t3 = clock();
+            for (auto i = 0; i < TRIES; i++) {
+                for (auto j = 0; j < NUM_VALUES; j++) {
+                    s_precompute += ParityPreComputeK(test_data[j], kPreComputeParity);
+                }
+            }
+            t_precompute = (float)(clock() - t3) / CLOCKS_PER_SEC;
+
+            // Benchmark XOR parity
+            const auto t4 = clock();
+            for (auto i = 0; i < TRIES; i++) {
+                for (auto j = 0; j < NUM_VALUES; j++) {
+                    s_xor += ParityXOR(test_data[j]);
+                }
+            }
+            t_xor = (float)(clock() - t4) / CLOCKS_PER_SEC;
+        },
+        "C++/{} (parity algorithms)", COMPILER);
+
+    // cout << fixed;
+    // cout << "Brute Force Parity O(n): sum=" << s_brute 
+    //      << ", time=" << setprecision(4) << t_brute << "s" << endl;
+    // cout << "Bit Fiddling Parity O(k): sum=" << s_bitfiddle 
+    //      << ", time=" << setprecision(4) << t_bitfiddle << "s" << endl;
+    // cout << "Precomputed Parity O(n/L): sum=" << s_precompute 
+    //      << ", time=" << setprecision(4) << t_precompute << "s" << endl;
+    // cout << "XOR Folding Parity O(log n): sum=" << s_xor 
+    //      << ", time=" << setprecision(4) << t_xor << "s" << endl;
 
     return 0;
 }

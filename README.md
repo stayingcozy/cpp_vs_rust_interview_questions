@@ -14,6 +14,13 @@ base64 (non EPI book) baseline test.
 |                    Rust | 1.033<sub>±00.005</sub> | 2.34<sub>±00.00</sub> + 0.00<sub>±00.00</sub> |
 | C++/clang++ (libcrypto) | 4.485<sub>±00.040</sub> | 6.48<sub>±00.08</sub> + 0.00<sub>±00.00</sub> |
 
+parity - 4.2; too small input to properly test (fix)
+|                        Language |                  Time, s |                                     Memory, MiB |
+| :------------------------------ | -----------------------: | ----------------------------------------------: |
+| C++/clang++ (parity algorithms) | 0.000<sub>±00.000</sub> | 0.00<sub>±00.00</sub> + 0.00<sub>±00.00</sub> |
+|                            Rust | 0.007<sub>±00.001</sub> | 2.81<sub>±00.00</sub> + 0.00<sub>±00.00</sub> |
+
+
 
 # Manual Run
 Build Analyzer
