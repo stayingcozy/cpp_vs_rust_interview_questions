@@ -7,6 +7,13 @@ Benchmarks inspired by kostya/benchmarks. Speed, memory, and energy consumed wil
 
 run.bat for windows. (moving to debian as soon as I get a clean, working solution for Solidworks on there)
 
+# Results
+base64 (non EPI book) baseline test. 
+|                Language |                  Time, s |                                     Memory, MiB |
+| :---------------------- | -----------------------: | ----------------------------------------------: |
+|                    Rust | 1.033<sub>±00.005</sub> | 2.34<sub>±00.00</sub> + 0.00<sub>±00.00</sub> |
+| C++/clang++ (libcrypto) | 4.485<sub>±00.040</sub> | 6.48<sub>±00.08</sub> + 0.00<sub>±00.00</sub> |
+
 
 # Manual Run
 Build Analyzer

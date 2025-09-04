@@ -2,8 +2,8 @@ include ../../common/commands.mk
 .DEFAULT_GOAL := build
 
 executables := \
-	target/parity_cpp_clang \
-	parity.rs/target/release/parity
+	target/base64_cpp_clang_crypto \
+	base64.rs/target/release/base64
 
 artifacts := $(executables)
 
@@ -17,12 +17,12 @@ build: $(artifacts) $(XTIME)
 $(XTIME): ../../xtime.cpp
 	$(XTIME_BUILD)
 
-target/parity_cpp_clang: parity.cpp | target libnotify
-	$(CLANG_CPP_BUILD)
+target/base64_cpp_clang_crypto: test-crypto.cpp | target libnotify
+	$(CLANG_CPP_BUILD) -lcrypto
 
-parity-rs-toml := parity.rs/Cargo.toml
-.PHONY: parity.rs/target/release/parity
-parity.rs/target/release/parity: $(parity-rs-toml)
+base64-rs-toml := base64.rs/Cargo.toml
+.PHONY: base64.rs/target/release/base64
+base64.rs/target/release/base64: $(base64-rs-toml)
 	$(CARGO_BUILD)
 
 # Run
@@ -42,5 +42,5 @@ $(executable_runners):: run[%] : %
 # Utilities
 .PHONY: clean
 clean:
-	cargo clean --manifest-path $(parity-rs-toml)
+	cargo clean --manifest-path $(base64-rs-toml)
 	-rm -rf target
