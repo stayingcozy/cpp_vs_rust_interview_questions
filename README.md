@@ -43,7 +43,7 @@ ATTEMPTS=<#_of_attempts> ../../analyzer make run
 
 # TODO
 Benchmark Environment & Testing
-- [ ] Add TCP stream of input data for testing with docker image (great example: [kostya/benchmarks](https://github.com/kostya/benchmarks))
+- [ ] Scale Parity inputs for proper testing. 
 
 EPI Book Sections
 - [ ] Complete Data Structures and Algorithms
