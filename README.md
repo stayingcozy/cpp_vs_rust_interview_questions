@@ -42,6 +42,9 @@ ATTEMPTS=<#_of_attempts> ../../analyzer make run
 ```
 
 # TODO
+Up Nxt
+- [ ] Test swap_bits cpp, push
+
 Benchmark Environment & Testing
 - [ ] Scale Parity inputs for proper testing. 
 
