@@ -22,6 +22,13 @@ double compute_pow_bit(double x, int y) {
     double res = 1.0;
     long long power = y;
 
+    // y is negative
+    if (y < 0) {
+        power *= -1;
+        x = 1.0 / x;
+    } 
+
+
     while (power) {
         if (power & 1) {
             res *= x;
